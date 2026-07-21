@@ -133,4 +133,26 @@ margin-top:10px;
 cursor:pointer;
 
 }
+.reverse-badge{
+    background:#1976d2;
+    color:white;
+    padding:5px 12px;
+    border-radius:20px;
+    font-weight:600;
+}
 
+.normal-badge{
+    background:#2e7d32;
+    color:white;
+    padding:5px 12px;
+    border-radius:20px;
+    font-weight:600;
+}
+
+.pending-badge{
+    background:#9e9e9e;
+    color:white;
+    padding:5px 12px;
+    border-radius:20px;
+    font-weight:600;
+}

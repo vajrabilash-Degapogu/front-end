@@ -253,6 +253,7 @@ const assignTag = async (tagId) => {
               <th>Emergency Phone</th>
               <th>Status</th>
               <th>Action</th>
+              <th>Sticker Type</th>
               <th>Assign Tag</th>
               <th>Actions</th>
             </tr>
@@ -268,6 +269,15 @@ const assignTag = async (tagId) => {
                 <td>{o.address}</td>
                 <td>{o.emergencyName}</td>
                 <td>{o.emergencyPhone}</td>
+                <td>
+                  {o.stickerType === "REVERSE" ? (
+                      <span className="reverse-badge">🔵 Reverse</span>
+                  ) : o.stickerType === "NORMAL" ? (
+                      <span className="normal-badge">🟢 Normal</span>
+                  ) : (
+                      <span className="pending-badge">⚪ Not Selected</span>
+                  )}
+                </td>
 
                 <td>
                   <span className={`status ${o.status}`}>

@@ -18,7 +18,8 @@ function VehiclePage() {
     emergencyName: "",
     emergencyPhone: "",
     address: "",
-    vehicleNumber: ""
+    vehicleNumber: "",
+    stickerType: ""
   });
 
   // ✅ FIX: FORCE REFRESH + CLEAR OLD DATA
@@ -89,19 +90,21 @@ console.log("Loaded code:", code);
     emergencyPhone: form.emergencyPhone.trim(),
     address: form.address.trim(),
     vehicleNumber: form.vehicleNumber.trim().toUpperCase(),
-    vehicleCode: code
-  };
+    vehicleCode: code,
+    stickerType: form.stickerType
+};
 
   if (
-  !data.name ||
-  !data.phone ||
-  !data.address ||
-  !data.vehicleNumber
+    !data.name ||
+    !data.phone ||
+    !data.address ||
+    !data.vehicleNumber ||
+    !form.stickerType
 ) {
-    setError("Please fill all fields");
+    setError("Please select sticker type.");
     setTimeout(() => setError(""), 2500);
     return;
-  }
+}
 
   try {
 
@@ -289,6 +292,31 @@ console.log("Loaded code:", code);
                   })
                 }
               />
+              {/* <label className="form-label">
+    Sticker Type <span style={{ color: "red" }}>*</span>
+</label> */}
+
+<select
+    className="text-black"
+    value={form.stickerType}
+    onChange={(e) =>
+        setForm({
+            ...form,
+            stickerType: e.target.value
+        })
+    }
+>
+    <option value="">Select Sticker Type</option>
+
+    <option value="REVERSE">
+        Reverse Print Sticker (Stick From Inside)
+    </option>
+
+    <option value="NORMAL">
+        Normal Sticker (Outside Sticker)
+    </option>
+
+</select>
 
               <input
                 className="text-black"

@@ -22,22 +22,24 @@ export default function LandingPage() {
   const [showVideo, setShowVideo] = useState(false);
 
   const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    emergencyName: "",
-    emergencyPhone: "",
-    vehicleNumber: "",
-    address: ""
-  });
+  name: "",
+  phone: "",
+  emergencyName: "",
+  emergencyPhone: "",
+  vehicleNumber: "",
+  address: "",
+  stickerType: ""
+});
 
   const submit = async () => {
 
     if (
-      !form.name.trim() ||
-      !form.phone.trim() ||
-      !form.vehicleNumber.trim() ||
-      !form.address.trim()
-    ) {
+    !form.name.trim() ||
+    !form.phone.trim() ||
+    !form.vehicleNumber.trim() ||
+    !form.address.trim() ||
+    !form.stickerType
+  ) {
       setError("Please fill all fields.");
       setTimeout(() => setError(""), 3000);
       return;
@@ -50,13 +52,14 @@ export default function LandingPage() {
       setSuccess(true);
 
       setForm({
-        name: "",
-        phone: "",
-        emergencyName: "",
-        emergencyPhone: "",
-        vehicleNumber: "",
-        address: ""
-      });
+      name: "",
+      phone: "",
+      emergencyName: "",
+      emergencyPhone: "",
+      vehicleNumber: "",
+      address: "",
+      stickerType: ""
+    });
 
       setTimeout(() => {
         setSuccess(false);
@@ -160,18 +163,24 @@ export default function LandingPage() {
               }
             />
 
-            <input
-              className="w-full p-3 border rounded-lg"
-              placeholder="📱 Phone Number *"
-              value={form.phone}
-              maxLength={10}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  phone: e.target.value.replace(/\D/g, "")
-                })
-              }
-            />
+            <div className="flex items-center border rounded-lg overflow-hidden">
+  <span className="bg-gray-100 px-4 py-3 text-gray-700 font-semibold border-r">
+    +91
+  </span>
+
+  <input
+    className="flex-1 p-3 outline-none"
+    placeholder="📱 Phone Number *"
+    value={form.phone}
+    maxLength={10}
+    onChange={(e) =>
+      setForm({
+        ...form,
+        phone: e.target.value.replace(/\D/g, "")
+      })
+    }
+  />
+</div>
 
             <input
               className="w-full p-3 border rounded-lg"
@@ -185,8 +194,13 @@ export default function LandingPage() {
               }
             />
 
+            <div className="flex items-center border rounded-lg overflow-hidden">
+            <span className="bg-gray-100 px-4 py-3 text-gray-700 font-semibold border-r">
+              +91
+            </span>
+
             <input
-              className="w-full p-3 border rounded-lg"
+              className="flex-1 p-3 outline-none"
               placeholder="📞 Emergency Contact Number (Optional)"
               value={form.emergencyPhone}
               maxLength={10}
@@ -197,6 +211,32 @@ export default function LandingPage() {
                 })
               }
             />
+          </div>
+
+          {/* <label className="font-semibold text-gray-700">
+            🏷️ Sticker Type <span className="text-red-500">*</span>
+          </label> */}
+
+          <select
+            className="w-full p-3 border rounded-lg bg-white"
+            value={form.stickerType}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                stickerType: e.target.value
+              })
+            }
+          >
+            <option value="">Select Sticker Type</option>
+
+            <option value="REVERSE">
+              Reverse Print Sticker (Inside Windshield)
+            </option>
+
+            <option value="NORMAL">
+              Normal Sticker (Outside Sticker)
+            </option>
+          </select>
 
             <input
               className="w-full p-3 border rounded-lg"
