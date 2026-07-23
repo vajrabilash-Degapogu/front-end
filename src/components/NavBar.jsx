@@ -94,12 +94,7 @@ export default function Navbar({ onOrderClick,  showOrderButton = true, showTrac
               </button>
             )}
 
-              <button
-                onClick={() => navigate("/login")}
-                className="border border-indigo-400 text-indigo-300 hover:bg-indigo-600 hover:text-white transition px-5 py-2 rounded-xl"
-              >
-                Admin Login
-              </button>
+              
 
             </div>
 
@@ -156,15 +151,7 @@ export default function Navbar({ onOrderClick,  showOrderButton = true, showTrac
               Get 2 Tags @ ₹339
             </button>
 
-            <button
-              onClick={() => {
-                navigate("/login");
-                setOpen(false);
-              }}
-              className="border border-indigo-500 px-8 py-3 rounded-xl text-indigo-300"
-            >
-              Admin Login
-            </button>
+            
 
           </div>
 

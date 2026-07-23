@@ -27,8 +27,9 @@ function Dashboard() {
          <button
   className="logout-btn"
   onClick={() => {
-    localStorage.removeItem("admin");
-    navigate("/");
+    localStorage.removeItem("token");
+localStorage.removeItem("username");
+navigate("/");
   }}
 >
   🚪 Logout

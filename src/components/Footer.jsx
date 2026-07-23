@@ -87,14 +87,7 @@ export default function Footer() {
                 </button>
               </li>
 
-              <li>
-                <button
-                  onClick={() => navigate("/login")}
-                  className="text-gray-400 hover:text-orange-500 transition"
-                >
-                  Admin Login
-                </button>
-              </li>
+              
 
             </ul>
 

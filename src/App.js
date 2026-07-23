@@ -20,7 +20,7 @@ function App() {
       <Routes>
 
         {/* 🔐 Login Page */}
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/control-center" element={<LoginPage />} />
 
         {/* 🔐 Track Page */}
         <Route path="/track" element={<TrackPage />} />
@@ -37,7 +37,14 @@ function App() {
         />
 
         {/* 🧾 Orders */}
-        <Route path="/orders" element={<OrdersPage />} />
+        <Route
+    path="/orders"
+    element={
+        <PrivateRoute>
+            <OrdersPage />
+        </PrivateRoute>
+    }
+/>
 
         {/* 🏠 Landing */}
         <Route path="/" element={<LandingPage />} />

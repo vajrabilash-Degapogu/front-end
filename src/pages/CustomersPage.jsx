@@ -36,33 +36,47 @@ function CustomersPage() {
 
 
   //PDF download
-  const downloadPDF = async (code, name, phone) => {
-  try {
-    const safeName = (name || "customer").replace(/[^a-zA-Z0-9]/g, "_");
-    const first5 = (phone || "00000").replace(/\D/g, "").substring(0, 5);
+//   const downloadPDF = async (code, name, phone) => {
+//   try {
+//     const safeName = (name || "customer").replace(/[^a-zA-Z0-9]/g, "_");
+//     const first5 = (phone || "00000").replace(/\D/g, "").substring(0, 5);
 
-    const res = await api.get(`/tag-pdf/${code}`, {
-      responseType: "blob"   // 🔥 IMPORTANT
-    });
+//     const res = await api.get(`/tag-pdf/${code}`, {
+//       responseType: "blob"   // 🔥 IMPORTANT
+//     });
 
-    const url = window.URL.createObjectURL(new Blob([res.data]));
+//     const url = window.URL.createObjectURL(new Blob([res.data]));
 
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${safeName}_${first5}.pdf`; // ✅ FINAL NAME
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+//     const link = document.createElement("a");
+//     link.href = url;
+//     link.download = `${safeName}_${first5}.pdf`; // ✅ FINAL NAME
+//     document.body.appendChild(link);
+//     link.click();
+//     link.remove();
 
-  } catch (err) {
-  setError(
-    err.response?.data?.message ||
-    err.response?.data ||
-    "❌ PDF download failed"
-  );
+//   } catch (err) {
+//   setError(
+//     err.response?.data?.message ||
+//     err.response?.data ||
+//     "❌ PDF download failed"
+//   );
 
-  setTimeout(() => setError(""), 3000);
-}
+//   setTimeout(() => setError(""), 3000);
+// }
+// };
+const downloadPdf = async (sheetCode) => {
+
+    console.log("Token:", localStorage.getItem("token"));
+
+    const response = await api.get(
+        `/tag-sheet/${sheetCode}/pdf`,
+        {
+            responseType: "blob"
+        }
+    );
+
+    console.log(response);
+
 };
 
   // ✅ FINAL TAG DOWNLOAD (FULL TAG WITH QR)

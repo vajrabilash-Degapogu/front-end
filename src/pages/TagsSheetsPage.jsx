@@ -101,11 +101,32 @@ function TagsSheetsPage() {
 
 };
 
-const downloadPdf = (sheetCode) => {
-    window.open(
-        `${BASE_URL}/api/tag-sheet/${sheetCode}/pdf`,
-        "_blank"
-    );
+const downloadPdf = async (sheetCode) => {
+  try {
+    const response = await api.get(`/tag-sheet/${sheetCode}/pdf`, {
+      responseType: "blob",
+    });
+
+    const blob = new Blob([response.data], {
+      type: "application/pdf",
+    });
+
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${sheetCode}.pdf`;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+
+  } catch (err) {
+    console.error(err);
+    alert("PDF Download Failed");
+  }
 };
 
   const generateSheet = async () => {

@@ -2,9 +2,13 @@ import { Navigate } from "react-router-dom";
 
 function PrivateRoute({ children }) {
 
-  const isLoggedIn = localStorage.getItem("admin");
+    const token = localStorage.getItem("token");
 
-  return isLoggedIn ? children : <Navigate to="/" />;
+    if (!token) {
+        return <Navigate to="/control-center" replace />;
+    }
+
+    return children;
 }
 
 export default PrivateRoute;

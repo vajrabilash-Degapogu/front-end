@@ -1,4 +1,5 @@
 import { useState } from "react";
+import api from "../services/api";
 import { useNavigate } from "react-router-dom";
 import "../css/LoginPage.css";
 import Navbar from "../components/NavBar";
@@ -13,40 +14,41 @@ function LoginPage() {
 
   const navigate = useNavigate();
 
-  const login = () => {
+  const login = async () => {
 
-    // Validate inputs
-    if (!username.trim() || !password.trim()) {
-      setError("⚠ Please enter username and password.");
-      setTimeout(() => setError(""), 2500);
-      return;
-    }
+  if (!username.trim() || !password.trim()) {
+    setError("⚠ Please enter username and password.");
+    setTimeout(() => setError(""), 2500);
+    return;
+  }
 
-    // Current login (temporary)
-    if (
-      username.trim() === "admin" &&
-      password === "AbhiAdmin@0399"
-    ) {
+  try {
 
-      localStorage.setItem("admin", "true");
+    const response = await api.post("/auth/login", {
+      username,
+      password,
+    });
 
-      setMessage("✅ Login Successful!");
+    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("username", response.data.username);
 
-      setTimeout(() => {
-        navigate("/admin");
-      }, 1000);
+    setMessage("✅ Login Successful!");
 
-    } else {
+    setTimeout(() => {
+      navigate("/admin");
+    }, 800);
 
-      setPassword("");
+  } catch (err) {
 
-      setError("❌ Invalid username or password.");
+    setPassword("");
 
-      setTimeout(() => {
-        setError("");
-      }, 2500);
-    }
-  };
+    setError("❌ Invalid username or password.");
+
+    setTimeout(() => setError(""), 2500);
+
+  }
+
+};
 
   return (
     <>
@@ -68,7 +70,7 @@ function LoginPage() {
         <Navbar showOrderButton={false} />
 
         <div className="login-bg">
-          <div className="login-card">
+          <div className="login-card" >
 
             <h2>🔐 Admin Login</h2>
 
