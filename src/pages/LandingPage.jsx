@@ -18,6 +18,7 @@ export default function LandingPage() {
 
   const [showForm, setShowForm] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [errors, setErrors] = useState({});
   const [error, setError] = useState("");
   const [showVideo, setShowVideo] = useState(false);
 
@@ -33,25 +34,95 @@ export default function LandingPage() {
 
   const submit = async () => {
 
-    if (
-    !form.name.trim() ||
-    !form.phone.trim() ||
-    !form.vehicleNumber.trim() ||
-    !form.address.trim() ||
-    !form.stickerType
+  const validationErrors = {};
+
+  // Name
+  const customerName = form.name.trim();
+
+if (!customerName) {
+  validationErrors.name = "Customer name is required.";
+} else if (!/^[A-Za-z ]+$/.test(customerName)) {
+  validationErrors.name = "Customer name should contain only alphabets.";
+} else if (customerName.replace(/\s/g, "").length < 4) {
+  validationErrors.name =
+    "Customer name must contain at least 4 letters.";
+}
+
+  // Phone
+  if (!/^[0-9]{10}$/.test(form.phone)) {
+    validationErrors.phone = "Phone number must contain exactly 10 digits.";
+  }
+
+  // Emergency Name
+  // Emergency Contact Validation
+
+const emergencyName = form.emergencyName.trim();
+const emergencyPhone = form.emergencyPhone.trim();
+
+// If name is entered, phone is mandatory
+if (emergencyName && !emergencyPhone) {
+  validationErrors.emergencyPhone =
+    "Please enter the emergency contact number.";
+}
+
+// If phone is entered, name is mandatory
+if (emergencyPhone && !emergencyName) {
+  validationErrors.emergencyName =
+    "Please enter the emergency contact name.";
+}
+
+// Validate emergency name
+if (emergencyName) {
+  if (!/^[A-Za-z ]+$/.test(emergencyName)) {
+    validationErrors.emergencyName =
+      "Emergency contact name should contain only alphabets.";
+  } else if (emergencyName.replace(/\s/g, "").length < 4) {
+    validationErrors.emergencyName =
+      "Emergency contact name must contain at least 4 letters.";
+  }
+}
+
+// Validate emergency phone
+if (emergencyPhone && !/^[0-9]{10}$/.test(emergencyPhone)) {
+  validationErrors.emergencyPhone =
+    "Emergency contact number must contain exactly 10 digits.";
+}
+
+  // Sticker
+  if (!form.stickerType) {
+    validationErrors.stickerType = "Please select sticker type.";
+  }
+
+  // Vehicle
+  if (
+    !/^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/.test(form.vehicleNumber)
   ) {
-      setError("Please fill all fields.");
-      setTimeout(() => setError(""), 3000);
-      return;
-    }
+    validationErrors.vehicleNumber =
+      "Vehicle number should be like AP40JA1234.";
+  }
 
-    try {
+  // Address
+  if (!form.address.trim()) {
+    validationErrors.address = "Delivery address is required.";
+  } else if (!/\b\d{6}\b/.test(form.address)) {
+    validationErrors.address =
+      "Delivery address must include a valid 6-digit PIN code.";
+  }
 
-      await api.post("/order", form);
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    return;
+  }
 
-      setSuccess(true);
+  setErrors({});
 
-      setForm({
+  try {
+
+    await api.post("/order", form);
+
+    setSuccess(true);
+
+    setForm({
       name: "",
       phone: "",
       emergencyName: "",
@@ -61,52 +132,30 @@ export default function LandingPage() {
       stickerType: ""
     });
 
-      setTimeout(() => {
-        setSuccess(false);
-        setShowForm(false);
-      }, 2500);
+    setTimeout(() => {
+      setSuccess(false);
+      setShowForm(false);
+    }, 2500);
 
-    } catch (err) {
+  } catch (err) {
 
-  let message = "Unable to place order.";
+    let message = "Unable to place order.";
 
-  const data = err.response?.data;
+    const data = err.response?.data;
 
-  if (typeof data === "string") {
-    message = data;
-  }
-  else if (data?.message) {
-    message = data.message;
-  }
-  else if (data?.errors) {
-    message = Object.values(data.errors).join("\n");
-  }
-  else if (data?.name) {
-    message = data.name;
-  }
-  else if (data?.phone) {
-    message = data.phone;
-  }
-  else if (data?.emergencyName) {
-    message = data.emergencyName;
-  }
-  else if (data?.emergencyPhone) {
-    message = data.emergencyPhone;
-  }
-  else if (data?.vehicleNumber) {
-    message = data.vehicleNumber;
-  }
-  else if (data?.address) {
-    message = data.address;
+    if (typeof data === "string") {
+      message = data;
+    } else if (data?.message) {
+      message = data.message;
+    }
+
+    setError(message);
+
+    setTimeout(() => setError(""), 3000);
+
   }
 
-  setError(message);
-
-  setTimeout(() => {
-    setError("");
-  }, 3000);
-  }
-  };
+};
 
   return (
 
@@ -155,13 +204,18 @@ export default function LandingPage() {
               className="w-full p-3 border rounded-lg"
               placeholder="👤 Full Name *"
               value={form.name}
-              onChange={(e) =>
+              onChange={(e)=>
                 setForm({
-                  ...form,
-                  name: e.target.value
+                ...form,
+                name:e.target.value.replace(/[^a-zA-Z ]/g,"")
                 })
-              }
+                }
             />
+            {errors.name && (
+            <p className="text-red-500 text-sm">
+            {errors.name}
+            </p>
+            )}
 
             <div className="flex items-center border rounded-lg overflow-hidden">
   <span className="bg-gray-100 px-4 py-3 text-gray-700 font-semibold border-r">
@@ -176,10 +230,15 @@ export default function LandingPage() {
     onChange={(e) =>
       setForm({
         ...form,
-        phone: e.target.value.replace(/\D/g, "")
+        phone:e.target.value.replace(/\D/g,"").slice(0,10)
       })
     }
   />
+  {errors.phone && (
+<p className="text-red-500 text-sm">
+{errors.phone}
+</p>
+)}
 </div>
 
             <input
@@ -189,10 +248,15 @@ export default function LandingPage() {
               onChange={(e) =>
                 setForm({
                   ...form,
-                  emergencyName: e.target.value
+                  emergencyName:e.target.value.replace(/[^a-zA-Z ]/g,"")
                 })
               }
             />
+            {errors.emergencyName && (
+            <p className="text-red-500 text-sm">
+            {errors.emergencyName}
+            </p>
+            )}
 
             <div className="flex items-center border rounded-lg overflow-hidden">
             <span className="bg-gray-100 px-4 py-3 text-gray-700 font-semibold border-r">
@@ -207,10 +271,15 @@ export default function LandingPage() {
               onChange={(e) =>
                 setForm({
                   ...form,
-                  emergencyPhone: e.target.value.replace(/\D/g, "")
+                  emergencyPhone: e.target.value.replace(/\D/g,"").slice(0,10)
                 })
               }
             />
+            {errors.emergencyPhone && (
+            <p className="text-red-500 text-sm">
+            {errors.emergencyPhone}
+            </p>
+            )}
           </div>
 
           {/* <label className="font-semibold text-gray-700">
@@ -227,6 +296,7 @@ export default function LandingPage() {
               })
             }
           >
+            
             <option value="">Select Sticker Type</option>
 
             <option value="REVERSE">
@@ -237,6 +307,11 @@ export default function LandingPage() {
               Normal Sticker (Outside Sticker)
             </option>
           </select>
+          {errors.stickerType && (
+          <p className="text-red-500 text-sm">
+          {errors.stickerType}
+          </p>
+          )}
 
             <input
               className="w-full p-3 border rounded-lg"
@@ -245,10 +320,15 @@ export default function LandingPage() {
               onChange={(e) =>
                 setForm({
                   ...form,
-                  vehicleNumber: e.target.value.toUpperCase()
+                  vehicleNumber:e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,"")
                 })
               }
             />
+            {errors.vehicleNumber && (
+            <p className="text-red-500 text-sm">
+            {errors.vehicleNumber}
+            </p>
+            )}
 
             <textarea
               className="w-full p-3 border rounded-lg"
@@ -261,6 +341,11 @@ export default function LandingPage() {
                 })
               }
             />
+            {errors.address && (
+            <p className="text-red-500 text-sm">
+            {errors.address}
+            </p>
+            )}
 
             </div>
 
