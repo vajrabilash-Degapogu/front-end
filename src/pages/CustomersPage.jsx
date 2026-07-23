@@ -65,20 +65,32 @@ function CustomersPage() {
 // }
 // };
 const downloadPdf = async (sheetCode) => {
+  try {
+    const response = await api.get(`/tag-sheet/${sheetCode}/pdf`, {
+      responseType: "blob",
+    });
 
-    console.log("Token:", localStorage.getItem("token"));
+    const blob = new Blob([response.data], {
+      type: "application/pdf",
+    });
 
-    const response = await api.get(
-        `/tag-sheet/${sheetCode}/pdf`,
-        {
-            responseType: "blob"
-        }
-    );
+    const url = window.URL.createObjectURL(blob);
 
-    console.log(response);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${sheetCode}.pdf`;
 
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+
+  } catch (err) {
+    setError("❌ PDF download failed");
+    setTimeout(() => setError(""), 3000);
+  }
 };
-
   // ✅ FINAL TAG DOWNLOAD (FULL TAG WITH QR)
   // const downloadTag = async (code, name, phone) => {
   //   try {
@@ -220,7 +232,7 @@ const downloadPdf = async (sheetCode) => {
                 <td>
                   <button
                     style={{ backgroundColor: "green", color: "black" }}
-                    onClick={() => downloadPDF(c.uniqueCode, c.ownerName, c.phoneNumber)}
+                    onClick={() => downloadPdf(c.sheetCode)}
                   >
                     ⬇️ Download Tag
                   </button>
