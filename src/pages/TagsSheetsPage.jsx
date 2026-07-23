@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import api, { BASE_URL } from "../services/api";
+import api from "../services/api";
 import "../css/TagsSheetsPage.css";
 
 function TagsSheetsPage() {
