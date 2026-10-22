@@ -150,6 +150,7 @@ const downloadPdf = async (sheetCode) => {
     ...editingCustomer,
     ownerName: editingCustomer.ownerName.trim(),
     phoneNumber: editingCustomer.phoneNumber.trim(),
+    email: (editingCustomer.email || "").trim().toLowerCase(),
     emergencyName: (editingCustomer.emergencyName || "").trim(),
     emergencyPhone: (editingCustomer.emergencyPhone || "").trim(),
     vehicleNumber: editingCustomer.vehicleNumber.trim().toUpperCase(),
@@ -212,6 +213,7 @@ const downloadPdf = async (sheetCode) => {
               <th>ID</th>
               <th>Name</th>
               <th>Phone</th>
+              <th>Email</th>
               <th>Vehicle</th>
               <th>Tag ID</th>
               <th>Sheet</th>
@@ -229,6 +231,7 @@ const downloadPdf = async (sheetCode) => {
                 <td>{c.id}</td>
                 <td>{c.ownerName}</td>
                 <td>{c.phoneNumber}</td>
+                <td>{c.email || "—"}</td>
                 <td>{c.vehicleNumber}</td>
                 <td>{c.tagId}</td>
                 <td>{c.sheetCode}</td>
@@ -287,6 +290,13 @@ const downloadPdf = async (sheetCode) => {
                   setEditingCustomer({ ...editingCustomer, phoneNumber: e.target.value.replace(/\D/g,"") })
                 }
                 maxLength={10}
+              />
+
+              <input
+                type="email"
+                value={editingCustomer.email || ""}
+                placeholder="Customer email"
+                onChange={e => setEditingCustomer({ ...editingCustomer, email: e.target.value })}
               />
 
               <input
