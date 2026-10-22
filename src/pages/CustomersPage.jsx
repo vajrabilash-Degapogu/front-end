@@ -154,15 +154,9 @@ const downloadPdf = async (sheetCode) => {
     emergencyPhone: (editingCustomer.emergencyPhone || "").trim(),
     vehicleNumber: editingCustomer.vehicleNumber.trim().toUpperCase(),
     address: editingCustomer.address.trim(),
-    whatsappUsername: (editingCustomer.whatsappUsername || "").trim().replace(/^@/, ""),
-    whatsappUsernameLink: (editingCustomer.whatsappUsernameLink || "").trim()
+    whatsappUsername: (editingCustomer.whatsappUsername || "").trim().replace(/^@/, "")
   };
 
-  if (Boolean(data.whatsappUsername) !== Boolean(data.whatsappUsernameLink)) {
-    setError("Enter both the WhatsApp username and official sharing link, or leave both blank.");
-    setTimeout(() => setError(""), 3000);
-    return;
-  }
   if (data.whatsappUsername && !/^[A-Za-z0-9._]{3,35}$/.test(data.whatsappUsername)) {
     setError("WhatsApp username must be 3-35 letters, numbers, dots or underscores.");
     setTimeout(() => setError(""), 3000);
@@ -342,18 +336,8 @@ const downloadPdf = async (sheetCode) => {
                 })}
               />
 
-              <input
-                value={editingCustomer.whatsappUsernameLink || ""}
-                type="url"
-                placeholder="Official WhatsApp username sharing link"
-                maxLength={500}
-                onChange={e => setEditingCustomer({
-                  ...editingCustomer,
-                  whatsappUsernameLink: e.target.value.trimStart()
-                })}
-              />
               <p className="text-gray-600 text-sm">
-                Use the link copied from WhatsApp username sharing. Phone-number links are not supported.
+                OwnTag creates the WhatsApp username contact link automatically.
               </p>
 
               <div className="modal-buttons">
