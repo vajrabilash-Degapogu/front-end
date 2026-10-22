@@ -28,14 +28,12 @@ api.interceptors.response.use(
       const requestUrl = error.config?.url || "";
 
       // Customer login failures should stay on the customer login form.
-      if (requestUrl.startsWith("/customer-auth/")) {
-        if (requestUrl.startsWith("/customer-auth/me")) {
-          localStorage.removeItem("customerToken");
-          localStorage.removeItem("customerUsername");
-          localStorage.removeItem("customerEmail");
-          window.location.href = "/customer-login";
-        }
-      } else {
+      if (requestUrl.startsWith("/customer-auth/me")) {
+        localStorage.removeItem("customerToken");
+        localStorage.removeItem("customerUsername");
+        localStorage.removeItem("customerEmail");
+        window.location.href = "/customer-login";
+      } else if (!requestUrl.startsWith("/customer-auth/")) {
         localStorage.removeItem("token");
         localStorage.removeItem("username");
         window.location.href = "/control-center";
