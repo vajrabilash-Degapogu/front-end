@@ -102,29 +102,30 @@ console.log("Loaded code:", code);
     whatsappUsernameLink: form.whatsappUsernameLink.trim()
 };
 
+  // WhatsApp contact is optional, but username and sharing link must be paired.
+  if (Boolean(data.whatsappUsername) !== Boolean(data.whatsappUsernameLink)) {
+    setError("Enter both the WhatsApp username and official sharing link, or leave both blank.");
+    setTimeout(() => setError(""), 3000);
+    return;
+  }
+
+  if (data.whatsappUsername && !/^[A-Za-z0-9._]{3,35}$/.test(data.whatsappUsername)) {
+    setError("WhatsApp username must be 3-35 letters, numbers, dots or underscores.");
+    setTimeout(() => setError(""), 3000);
+    return;
+  }
+
   if (
     !data.name ||
     !data.phone ||
     !data.address ||
     !data.vehicleNumber ||
     !form.stickerType
-) {
-    // WhatsApp fields are optional, but must be supplied together.
-    if (Boolean(data.whatsappUsername) !== Boolean(data.whatsappUsernameLink)) {
-      setError("Enter both the WhatsApp username and official sharing link, or leave both blank.");
-      setTimeout(() => setError(""), 3000);
-      return;
-    }
-
-    if (data.whatsappUsername && !/^[A-Za-z0-9._]{3,35}$/.test(data.whatsappUsername)) {
-      setError("WhatsApp username must be 3-35 letters, numbers, dots or underscores.");
-      setTimeout(() => setError(""), 3000);
-      return;
-    }
-    setError("Please select sticker type.");
+  ) {
+    setError("Please complete all required fields and select sticker type.");
     setTimeout(() => setError(""), 2500);
     return;
-}
+  }
 
   try {
 
