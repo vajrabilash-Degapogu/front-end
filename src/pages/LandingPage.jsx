@@ -29,7 +29,9 @@ export default function LandingPage() {
   emergencyPhone: "",
   vehicleNumber: "",
   address: "",
-  stickerType: ""
+  stickerType: "",
+  whatsappUsername: "",
+  whatsappUsernameLink: ""
 });
 
   const submit = async () => {
@@ -109,6 +111,14 @@ if (emergencyPhone && !/^[0-9]{10}$/.test(emergencyPhone)) {
       "Delivery address must include a valid 6-digit PIN code.";
   }
 
+  const whatsappUsername = form.whatsappUsername.trim().replace(/^@/, "");
+  const whatsappUsernameLink = form.whatsappUsernameLink.trim();
+  if (Boolean(whatsappUsername) !== Boolean(whatsappUsernameLink)) {
+    validationErrors.whatsapp = "Enter both the WhatsApp username and the official username sharing link, or leave both blank.";
+  } else if (whatsappUsername && !/^[A-Za-z0-9._]{3,35}$/.test(whatsappUsername)) {
+    validationErrors.whatsapp = "WhatsApp username must be 3-35 letters, numbers, dots or underscores.";
+  }
+
   if (Object.keys(validationErrors).length > 0) {
     setErrors(validationErrors);
     return;
@@ -129,7 +139,9 @@ if (emergencyPhone && !/^[0-9]{10}$/.test(emergencyPhone)) {
       emergencyPhone: "",
       vehicleNumber: "",
       address: "",
-      stickerType: ""
+      stickerType: "",
+      whatsappUsername: "",
+      whatsappUsernameLink: ""
     });
 
     setTimeout(() => {
@@ -281,6 +293,29 @@ if (emergencyPhone && !/^[0-9]{10}$/.test(emergencyPhone)) {
             </p>
             )}
           </div>
+
+          <input
+            className="w-full p-3 border rounded-lg"
+            placeholder="WhatsApp username (optional, without @)"
+            value={form.whatsappUsername}
+            maxLength={35}
+            onChange={(e) => setForm({ ...form, whatsappUsername: e.target.value.replace(/^@/, "") })}
+          />
+
+          <input
+            className="w-full p-3 border rounded-lg"
+            type="url"
+            placeholder="Official WhatsApp username sharing link (optional)"
+            value={form.whatsappUsernameLink}
+            maxLength={500}
+            onChange={(e) => setForm({ ...form, whatsappUsernameLink: e.target.value.trimStart() })}
+          />
+          <p className="text-gray-600 text-xs">
+            Copy the username sharing link from WhatsApp. OwnTag will not use a phone-number link.
+          </p>
+          {errors.whatsapp && (
+            <p className="text-red-500 text-sm">{errors.whatsapp}</p>
+          )}
 
           {/* <label className="font-semibold text-gray-700">
             🏷️ Sticker Type <span className="text-red-500">*</span>
