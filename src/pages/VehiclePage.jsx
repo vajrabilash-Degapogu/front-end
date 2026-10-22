@@ -61,13 +61,6 @@ setError(message);
 }, [code]);
 console.log("Loaded code:", code);
 
-  const callNow = () => {
-    setMessage("📞 Connecting call...");
-    setTimeout(() => {
-      window.location.href = `${api.defaults.baseURL}/call/${code}`;
-    }, 800);
-  };
-
   const callEmergency = () => {
   setMessage("📞 Calling Emergency Contact...");
 
@@ -223,13 +216,6 @@ console.log("Loaded code:", code);
 
             <div className="buttons">
 
-            <button
-                style={{ backgroundColor: "white", color: "blue" }}
-                onClick={callNow}
-              >
-                📞 Call Owner
-              </button>
-
               {vehicle.emergencyContactAvailable && (
                 <button
                   style={{ backgroundColor: "#ff9800", color: "white" }}
@@ -245,15 +231,20 @@ console.log("Loaded code:", code);
                 disabled={!vehicle.whatsappAvailable}
                 title={!vehicle.whatsappAvailable ? "Owner has not configured WhatsApp username contact yet" : "Open WhatsApp"}
               >
-                💬 Chat on WhatsApp
+                💬 Chat & Call on WhatsApp
               </button>
 
           </div>
 
             {vehicle.whatsappAvailable && (
-              <p style={{ color: "black", marginTop: "8px" }}>
-                WhatsApp username: @{vehicle.whatsappUsername}
-              </p>
+              <>
+                <p style={{ color: "black", marginTop: "8px" }}>
+                  WhatsApp username: @{vehicle.whatsappUsername}
+                </p>
+                <p style={{ color: "black", fontSize: "0.9rem" }}>
+                  Start the chat in WhatsApp, then tap its voice-call icon to speak with the owner.
+                </p>
+              </>
             )}
             {!vehicle.whatsappAvailable && (
               <p style={{ color: "black", marginTop: "8px", fontSize: "0.9rem" }}>
