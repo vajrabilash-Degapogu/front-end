@@ -128,7 +128,11 @@ if (emergencyPhone && !/^[0-9]{10}$/.test(emergencyPhone)) {
 
   try {
 
-    await api.post("/order", form);
+    await api.post("/order", {
+      ...form,
+      whatsappUsername: whatsappUsername,
+      whatsappUsernameLink: whatsappUsernameLink
+    });
 
     setSuccess(true);
 
