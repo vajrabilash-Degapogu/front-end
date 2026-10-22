@@ -145,15 +145,17 @@ export default function Navbar({ onOrderClick,  showOrderButton = true, showTrac
               Home
             </button>
 
-            <button
-              onClick={() => {
-                navigate("/track");
-                setOpen(false);
-              }}
-              className="text-white hover:text-orange-400"
-            >
-              Track Order
-            </button>
+            {showTrackButton && (
+              <button
+                onClick={() => {
+                  navigate("/track");
+                  setOpen(false);
+                }}
+                className="text-white hover:text-orange-400"
+              >
+                Track Order
+              </button>
+            )}
 
             <button
               onClick={() => {
@@ -175,15 +177,17 @@ export default function Navbar({ onOrderClick,  showOrderButton = true, showTrac
               Register
             </button>
 
-            <button
-              onClick={() => {
-                onOrderClick();
-                setOpen(false);
-              }}
-              className="bg-orange-500 px-8 py-3 rounded-xl font-semibold text-white shadow-lg"
-            >
-              Get 2 Tags @ ₹339
-            </button>
+            {showOrderButton && (
+              <button
+                onClick={() => {
+                  onOrderClick?.();
+                  setOpen(false);
+                }}
+                className="bg-orange-500 px-8 py-3 rounded-xl font-semibold text-white shadow-lg"
+              >
+                Get 2 Tags @ ₹339
+              </button>
+            )}
 
             
 
