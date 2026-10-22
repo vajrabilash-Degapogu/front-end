@@ -153,8 +153,21 @@ const downloadPdf = async (sheetCode) => {
     emergencyName: editingCustomer.emergencyName.trim(),
     emergencyPhone: editingCustomer.emergencyPhone.trim(),
     vehicleNumber: editingCustomer.vehicleNumber.trim().toUpperCase(),
-    address: editingCustomer.address.trim()
+    address: editingCustomer.address.trim(),
+    whatsappUsername: (editingCustomer.whatsappUsername || "").trim().replace(/^@/, ""),
+    whatsappUsernameLink: (editingCustomer.whatsappUsernameLink || "").trim()
   };
+
+  if (Boolean(data.whatsappUsername) !== Boolean(data.whatsappUsernameLink)) {
+    setError("Enter both the WhatsApp username and official sharing link, or leave both blank.");
+    setTimeout(() => setError(""), 3000);
+    return;
+  }
+  if (data.whatsappUsername && !/^[A-Za-z0-9._]{3,35}$/.test(data.whatsappUsername)) {
+    setError("WhatsApp username must be 3-35 letters, numbers, dots or underscores.");
+    setTimeout(() => setError(""), 3000);
+    return;
+  }
 
   try {
 
@@ -318,6 +331,30 @@ const downloadPdf = async (sheetCode) => {
                   setEditingCustomer({ ...editingCustomer, address: e.target.value })
                 }
               />
+
+              <input
+                value={editingCustomer.whatsappUsername || ""}
+                placeholder="WhatsApp username (optional, without @)"
+                maxLength={35}
+                onChange={e => setEditingCustomer({
+                  ...editingCustomer,
+                  whatsappUsername: e.target.value.replace(/^@/, "")
+                })}
+              />
+
+              <input
+                value={editingCustomer.whatsappUsernameLink || ""}
+                type="url"
+                placeholder="Official WhatsApp username sharing link"
+                maxLength={500}
+                onChange={e => setEditingCustomer({
+                  ...editingCustomer,
+                  whatsappUsernameLink: e.target.value.trimStart()
+                })}
+              />
+              <p className="text-gray-600 text-sm">
+                Use the link copied from WhatsApp username sharing. Phone-number links are not supported.
+              </p>
 
               <div className="modal-buttons">
                 <button onClick={updateCustomer}>Save</button>
