@@ -192,6 +192,7 @@ const assignTag = async (tagId) => {
     ...editingOrder,
     name: editingOrder.name.trim(),
     phone: editingOrder.phone.trim(),
+    email: (editingOrder.email || "").trim().toLowerCase(),
     emergencyName: (editingOrder.emergencyName || "").trim(),
     emergencyPhone: (editingOrder.emergencyPhone || "").trim(),
     vehicleNumber: editingOrder.vehicleNumber.trim().toUpperCase(),
@@ -254,6 +255,7 @@ const assignTag = async (tagId) => {
               <th>ID</th>
               <th>Name</th>
               <th>Phone</th>
+              <th>Email</th>
               <th>Vehicle</th>
               <th>Address</th>
               <th>Emergency Name</th> 
@@ -272,6 +274,7 @@ const assignTag = async (tagId) => {
                 <td>{o.id}</td>
                 <td>{o.name}</td>
                 <td>{o.phone}</td>
+                <td>{o.email}</td>
                 <td>{o.vehicleNumber}</td>
                 <td>{o.address}</td>
                 <td>{o.emergencyName}</td>
@@ -359,6 +362,13 @@ const assignTag = async (tagId) => {
                 onChange={e =>
                   setEditingOrder({ ...editingOrder, phone: e.target.value.replace(/\D/g,"") })
                 }
+              />
+
+              <input
+                type="email"
+                value={editingOrder.email || ""}
+                placeholder="Customer email"
+                onChange={e => setEditingOrder({ ...editingOrder, email: e.target.value })}
               />
 
               <input
