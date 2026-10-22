@@ -30,8 +30,7 @@ export default function LandingPage() {
   vehicleNumber: "",
   address: "",
   stickerType: "",
-  whatsappUsername: "",
-  whatsappUsernameLink: ""
+  whatsappUsername: ""
 });
 
   const submit = async () => {
@@ -112,10 +111,7 @@ if (emergencyPhone && !/^[0-9]{10}$/.test(emergencyPhone)) {
   }
 
   const whatsappUsername = form.whatsappUsername.trim().replace(/^@/, "");
-  const whatsappUsernameLink = form.whatsappUsernameLink.trim();
-  if (Boolean(whatsappUsername) !== Boolean(whatsappUsernameLink)) {
-    validationErrors.whatsapp = "Enter both the WhatsApp username and the official username sharing link, or leave both blank.";
-  } else if (whatsappUsername && !/^[A-Za-z0-9._]{3,35}$/.test(whatsappUsername)) {
+  if (whatsappUsername && !/^[A-Za-z0-9._]{3,35}$/.test(whatsappUsername)) {
     validationErrors.whatsapp = "WhatsApp username must be 3-35 letters, numbers, dots or underscores.";
   }
 
@@ -130,8 +126,7 @@ if (emergencyPhone && !/^[0-9]{10}$/.test(emergencyPhone)) {
 
     await api.post("/order", {
       ...form,
-      whatsappUsername: whatsappUsername,
-      whatsappUsernameLink: whatsappUsernameLink
+      whatsappUsername: whatsappUsername
     });
 
     setSuccess(true);
@@ -144,8 +139,7 @@ if (emergencyPhone && !/^[0-9]{10}$/.test(emergencyPhone)) {
       vehicleNumber: "",
       address: "",
       stickerType: "",
-      whatsappUsername: "",
-      whatsappUsernameLink: ""
+      whatsappUsername: ""
     });
 
     setTimeout(() => {
@@ -306,16 +300,8 @@ if (emergencyPhone && !/^[0-9]{10}$/.test(emergencyPhone)) {
             onChange={(e) => setForm({ ...form, whatsappUsername: e.target.value.replace(/^@/, "") })}
           />
 
-          <input
-            className="w-full p-3 border rounded-lg"
-            type="url"
-            placeholder="Official WhatsApp username sharing link (optional)"
-            value={form.whatsappUsernameLink}
-            maxLength={500}
-            onChange={(e) => setForm({ ...form, whatsappUsernameLink: e.target.value.trimStart() })}
-          />
           <p className="text-gray-600 text-xs">
-            Copy the username sharing link from WhatsApp. OwnTag will not use a phone-number link.
+            Enter the username exactly as it appears in WhatsApp. OwnTag creates the username contact link automatically.
           </p>
           {errors.whatsapp && (
             <p className="text-red-500 text-sm">{errors.whatsapp}</p>
