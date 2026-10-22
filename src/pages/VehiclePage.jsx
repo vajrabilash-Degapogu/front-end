@@ -19,7 +19,9 @@ function VehiclePage() {
     emergencyPhone: "",
     address: "",
     vehicleNumber: "",
-    stickerType: ""
+    stickerType: "",
+    whatsappUsername: "",
+    whatsappUsernameLink: ""
   });
 
   // ✅ FIX: FORCE REFRESH + CLEAR OLD DATA
@@ -75,10 +77,14 @@ console.log("Loaded code:", code);
 };
 
   const whatsapp = () => {
+    if (!vehicle?.whatsappAvailable) {
+      setError("WhatsApp username contact is not configured for this vehicle yet.");
+      setTimeout(() => setError(""), 3000);
+      return;
+    }
+
     setMessage("Opening WhatsApp...");
-    setTimeout(() => {
-      window.location.href = `${api.defaults.baseURL}/whatsapp/${code}`;
-    }, 800);
+    window.location.href = `${api.defaults.baseURL}/whatsapp/${code}`;
   };
 
   const submitOrder = async () => {
@@ -91,7 +97,9 @@ console.log("Loaded code:", code);
     address: form.address.trim(),
     vehicleNumber: form.vehicleNumber.trim().toUpperCase(),
     vehicleCode: code,
-    stickerType: form.stickerType
+    stickerType: form.stickerType,
+    whatsappUsername: form.whatsappUsername.trim().replace(/^@/, ""),
+    whatsappUsernameLink: form.whatsappUsernameLink.trim()
 };
 
   if (
@@ -101,6 +109,18 @@ console.log("Loaded code:", code);
     !data.vehicleNumber ||
     !form.stickerType
 ) {
+    // WhatsApp fields are optional, but must be supplied together.
+    if (Boolean(data.whatsappUsername) !== Boolean(data.whatsappUsernameLink)) {
+      setError("Enter both the WhatsApp username and official sharing link, or leave both blank.");
+      setTimeout(() => setError(""), 3000);
+      return;
+    }
+
+    if (data.whatsappUsername && !/^[A-Za-z0-9._]{3,35}$/.test(data.whatsappUsername)) {
+      setError("WhatsApp username must be 3-35 letters, numbers, dots or underscores.");
+      setTimeout(() => setError(""), 3000);
+      return;
+    }
     setError("Please select sticker type.");
     setTimeout(() => setError(""), 2500);
     return;
@@ -118,7 +138,10 @@ console.log("Loaded code:", code);
     emergencyName: "",
     emergencyPhone: "",
     address: "",
-    vehicleNumber: ""
+    vehicleNumber: "",
+    stickerType: "",
+    whatsappUsername: "",
+    whatsappUsernameLink: ""
   });
 
     setShowForm(false);
@@ -206,7 +229,7 @@ console.log("Loaded code:", code);
                 📞 Call Owner
               </button>
 
-              {vehicle.emergencyPhone && vehicle.emergencyPhone.trim() !== "" && (
+              {vehicle.emergencyContactAvailable && (
                 <button
                   style={{ backgroundColor: "#ff9800", color: "white" }}
                   onClick={callEmergency}
@@ -216,13 +239,26 @@ console.log("Loaded code:", code);
               )}
 
               <button
-                style={{ backgroundColor: "green" }}
+                style={{ backgroundColor: "green", opacity: vehicle.whatsappAvailable ? 1 : 0.55 }}
                 onClick={whatsapp}
+                disabled={!vehicle.whatsappAvailable}
+                title={!vehicle.whatsappAvailable ? "Owner has not configured WhatsApp username contact yet" : "Open WhatsApp"}
               >
-                💬 WhatsApp
+                💬 Chat on WhatsApp
               </button>
 
           </div>
+
+            {vehicle.whatsappAvailable && (
+              <p style={{ color: "black", marginTop: "8px" }}>
+                WhatsApp username: @{vehicle.whatsappUsername}
+              </p>
+            )}
+            {!vehicle.whatsappAvailable && (
+              <p style={{ color: "black", marginTop: "8px", fontSize: "0.9rem" }}>
+                WhatsApp username contact is not configured for this vehicle yet.
+              </p>
+            )}
 
             <hr />
 
@@ -280,6 +316,26 @@ console.log("Loaded code:", code);
                   })
                 }
               />
+
+              <input
+                className="text-black"
+                placeholder="WhatsApp username (optional, without @)"
+                value={form.whatsappUsername}
+                maxLength={35}
+                onChange={e => setForm({ ...form, whatsappUsername: e.target.value.replace(/^@/, "") })}
+              />
+
+              <input
+                className="text-black"
+                type="url"
+                placeholder="Official WhatsApp username sharing link (optional)"
+                value={form.whatsappUsernameLink}
+                maxLength={500}
+                onChange={e => setForm({ ...form, whatsappUsernameLink: e.target.value.trimStart() })}
+              />
+              <p style={{ color: "black", fontSize: "0.8rem" }}>
+                Copy the username sharing link from WhatsApp. Do not enter a phone-number link.
+              </p>
 
               <textarea
                 className="text-black"
