@@ -7,6 +7,10 @@ import PrivateRoute from "./Auth/PrivateRoute";
 import LoginPage from "./pages/LoginPage";
 import LandingPage from "./pages/LandingPage";
 import TrackPage from "./pages/TrackPage";
+import CustomerLoginPage from "./pages/CustomerLoginPage";
+import CustomerRegisterPage from "./pages/CustomerRegisterPage";
+import CustomerRecoveryPage from "./pages/CustomerRecoveryPage";
+import CustomerAccountPage from "./pages/CustomerAccountPage";
 
 // ✅ WRAPPER TO FORCE RELOAD ON QR CHANGE
 function VehiclePageWrapper() {
@@ -24,6 +28,13 @@ function App() {
 
         {/* 🔐 Track Page */}
         <Route path="/track" element={<TrackPage />} />
+
+        {/* Customer authentication and account */}
+        <Route path="/customer-login" element={<CustomerLoginPage />} />
+        <Route path="/customer-register" element={<CustomerRegisterPage />} />
+        <Route path="/forgot-username" element={<CustomerRecoveryPage mode="username" />} />
+        <Route path="/forgot-password" element={<CustomerRecoveryPage mode="password" />} />
+        <Route path="/customer-account" element={<CustomerAccountPage />} />
 
         {/* 🚗 Public QR page (FIXED) */}
         <Route
