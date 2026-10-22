@@ -294,41 +294,6 @@ if (!customerName) {
               }}
             />
             {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-            {otpMessage && <p role="status" className="text-green-700 text-sm font-semibold">{otpMessage}</p>}
-
-            <button
-              type="button"
-              onClick={sendEmailOtp}
-              disabled={otpLoading}
-              className="w-full p-3 border border-indigo-500 rounded-lg font-semibold disabled:opacity-60"
-            >
-              {otpLoading ? "Please wait…" : "Send email OTP"}
-            </button>
-
-            {otpSentFor === form.email.trim().toLowerCase() && verifiedEmail !== form.email.trim().toLowerCase() && (
-              <div className="flex gap-2">
-                <input
-                  className="flex-1 min-w-0 p-3 border rounded-lg"
-                  placeholder="6-digit email OTP"
-                  value={otpCode}
-                  inputMode="numeric"
-                  maxLength={6}
-                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                />
-                <button
-                  type="button"
-                  onClick={verifyEmailOtp}
-                  disabled={otpLoading}
-                  className="px-4 rounded-lg bg-indigo-700 text-white font-semibold disabled:opacity-60"
-                >
-                  Verify
-                </button>
-              </div>
-            )}
-            {verifiedEmail === form.email.trim().toLowerCase() && form.email && (
-              <p className="text-green-700 text-sm font-semibold">✓ Email verified</p>
-            )}
-
           <input
             className="w-full p-3 border rounded-lg"
             placeholder="WhatsApp username (optional, without @)"
@@ -408,6 +373,42 @@ if (!customerName) {
             {errors.address}
             </p>
             )}
+
+            {otpMessage && <p role="status" className="text-green-700 text-sm font-semibold">{otpMessage}</p>}
+
+            <button
+              type="button"
+              onClick={sendEmailOtp}
+              disabled={otpLoading}
+              className="w-full p-3 border border-indigo-500 rounded-lg font-semibold disabled:opacity-60"
+            >
+              {otpLoading ? "Please wait…" : "Send email OTP"}
+            </button>
+
+            {otpSentFor === form.email.trim().toLowerCase() && verifiedEmail !== form.email.trim().toLowerCase() && (
+              <div className="flex gap-2">
+                <input
+                  className="flex-1 min-w-0 p-3 border rounded-lg"
+                  placeholder="6-digit email OTP"
+                  value={otpCode}
+                  inputMode="numeric"
+                  maxLength={6}
+                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                />
+                <button
+                  type="button"
+                  onClick={verifyEmailOtp}
+                  disabled={otpLoading}
+                  className="px-4 rounded-lg bg-indigo-700 text-white font-semibold disabled:opacity-60"
+                >
+                  Verify
+                </button>
+              </div>
+            )}
+            {verifiedEmail === form.email.trim().toLowerCase() && form.email && (
+              <p className="text-green-700 text-sm font-semibold">✓ Email verified</p>
+            )}
+
 
             </div>
 
