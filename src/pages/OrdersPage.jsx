@@ -196,15 +196,9 @@ const assignTag = async (tagId) => {
     emergencyPhone: (editingOrder.emergencyPhone || "").trim(),
     vehicleNumber: editingOrder.vehicleNumber.trim().toUpperCase(),
     address: editingOrder.address.trim(),
-    whatsappUsername: (editingOrder.whatsappUsername || "").trim().replace(/^@/, ""),
-    whatsappUsernameLink: (editingOrder.whatsappUsernameLink || "").trim()
+    whatsappUsername: (editingOrder.whatsappUsername || "").trim().replace(/^@/, "")
   };
 
-  if (Boolean(data.whatsappUsername) !== Boolean(data.whatsappUsernameLink)) {
-    setError("Enter both the WhatsApp username and official sharing link, or leave both blank.");
-    setTimeout(() => setError(""), 3000);
-    return;
-  }
   if (data.whatsappUsername && !/^[A-Za-z0-9._]{3,35}$/.test(data.whatsappUsername)) {
     setError("WhatsApp username must be 3-35 letters, numbers, dots or underscores.");
     setTimeout(() => setError(""), 3000);
@@ -414,16 +408,9 @@ const assignTag = async (tagId) => {
                 })}
               />
 
-              <input
-                value={editingOrder.whatsappUsernameLink || ""}
-                type="url"
-                placeholder="Official WhatsApp username sharing link"
-                maxLength={500}
-                onChange={e => setEditingOrder({
-                  ...editingOrder,
-                  whatsappUsernameLink: e.target.value.trimStart()
-                })}
-              />
+              <p className="text-gray-600 text-sm">
+                OwnTag creates the WhatsApp username contact link automatically.
+              </p>
 
               <div className="modal-buttons">
                 <button onClick={updateOrder}>Save</button>
