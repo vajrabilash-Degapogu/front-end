@@ -26,26 +26,21 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       const requestUrl = error.config?.url || "";
-      const isCustomerAuthRequest = requestUrl.startsWith("/customer-auth/");
-      const isCustomerAccountRequest = requestUrl.startsWith("/customer-auth/me");
 
-      // Invalid credentials on login should show the form error, not redirect to admin.
-      if (!isCustomerAuthRequest) {
-        const sentAuthorization = error.config?.headers?.Authorization;
-        const customerToken = localStorage.getItem("customerToken");
-        if (customerToken && sentAuthorization === `Bearer ${customerToken}` || isCustomerAccountRequest) {
+      // Customer login failures should stay on the customer login form.
+      if (requestUrl.startsWith("/customer-auth/")) {
+        if (requestUrl.startsWith("/customer-auth/me")) {
           localStorage.removeItem("customerToken");
           localStorage.removeItem("customerUsername");
           localStorage.removeItem("customerEmail");
           window.location.href = "/customer-login";
-        } else {
-          localStorage.removeItem("token");
-          localStorage.removeItem("username");
-          window.location.href = "/control-center";
         }
+      } else {
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+        window.location.href = "/control-center";
       }
     }
-
     return Promise.reject(error);
   }
 );
