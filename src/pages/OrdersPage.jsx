@@ -192,11 +192,24 @@ const assignTag = async (tagId) => {
     ...editingOrder,
     name: editingOrder.name.trim(),
     phone: editingOrder.phone.trim(),
-    emergencyName: editingOrder.emergencyName.trim(),
-    emergencyPhone: editingOrder.emergencyPhone.trim(),
+    emergencyName: (editingOrder.emergencyName || "").trim(),
+    emergencyPhone: (editingOrder.emergencyPhone || "").trim(),
     vehicleNumber: editingOrder.vehicleNumber.trim().toUpperCase(),
-    address: editingOrder.address.trim()
+    address: editingOrder.address.trim(),
+    whatsappUsername: (editingOrder.whatsappUsername || "").trim().replace(/^@/, ""),
+    whatsappUsernameLink: (editingOrder.whatsappUsernameLink || "").trim()
   };
+
+  if (Boolean(data.whatsappUsername) !== Boolean(data.whatsappUsernameLink)) {
+    setError("Enter both the WhatsApp username and official sharing link, or leave both blank.");
+    setTimeout(() => setError(""), 3000);
+    return;
+  }
+  if (data.whatsappUsername && !/^[A-Za-z0-9._]{3,35}$/.test(data.whatsappUsername)) {
+    setError("WhatsApp username must be 3-35 letters, numbers, dots or underscores.");
+    setTimeout(() => setError(""), 3000);
+    return;
+  }
 
   try {
 
@@ -389,6 +402,27 @@ const assignTag = async (tagId) => {
                 onChange={e =>
                   setEditingOrder({ ...editingOrder, address: e.target.value })
                 }
+              />
+
+              <input
+                value={editingOrder.whatsappUsername || ""}
+                placeholder="WhatsApp username (optional, without @)"
+                maxLength={35}
+                onChange={e => setEditingOrder({
+                  ...editingOrder,
+                  whatsappUsername: e.target.value.replace(/^@/, "")
+                })}
+              />
+
+              <input
+                value={editingOrder.whatsappUsernameLink || ""}
+                type="url"
+                placeholder="Official WhatsApp username sharing link"
+                maxLength={500}
+                onChange={e => setEditingOrder({
+                  ...editingOrder,
+                  whatsappUsernameLink: e.target.value.trimStart()
+                })}
               />
 
               <div className="modal-buttons">
