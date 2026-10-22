@@ -50,6 +50,7 @@ export default function LandingPage() {
       setOtpSentFor(email);
       setVerifiedEmail("");
       setOtpCode("");
+      setErrors({});
       setOtpMessage("OTP sent to your email. Check your inbox and spam folder.");
     } catch (err) {
       setError(err.response?.data?.detail || err.response?.data?.message || "Could not send OTP. Check the email service configuration.");
@@ -74,6 +75,7 @@ export default function LandingPage() {
     try {
       await api.post("/email-otp/order/verify", { email, otp: otpCode });
       setVerifiedEmail(email);
+      setErrors({});
       setOtpMessage("Email verified successfully.");
     } catch (err) {
       setError(err.response?.data?.detail || err.response?.data?.message || "OTP verification failed.");
