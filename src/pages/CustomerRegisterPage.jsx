@@ -75,7 +75,7 @@ export default function CustomerRegisterPage() {
             <input autoComplete="username" value={username} onChange={e => setUsername(e.target.value)} className="mt-1 w-full rounded-lg border p-3 font-normal" minLength={3} maxLength={30} required />
           </label>
           <label className="block text-sm font-semibold">Email address
-            <input type="email" autoComplete="email" value={email} onChange={e => { setEmail(e.target.value); setVerifiedEmail(""); }} className="mt-1 w-full rounded-lg border p-3 font-normal" required />
+            <input type="email" autoComplete="email" value={email} onChange={e => { setEmail(e.target.value); setVerifiedEmail(""); setOtpSent(false); setOtp(""); }} className="mt-1 w-full rounded-lg border p-3 font-normal" required />
           </label>
           <button type="button" onClick={sendOtp} disabled={loading} className="w-full rounded-lg border border-indigo-600 text-indigo-700 font-semibold p-3 disabled:opacity-60">{loading ? "Please wait…" : "Send email OTP"}</button>
           {otpSent && verifiedEmail !== email.trim().toLowerCase() && <div className="flex gap-2">
