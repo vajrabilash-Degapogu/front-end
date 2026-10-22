@@ -20,8 +20,7 @@ function VehiclePage() {
     address: "",
     vehicleNumber: "",
     stickerType: "",
-    whatsappUsername: "",
-    whatsappUsernameLink: ""
+    whatsappUsername: ""
   });
 
   // ✅ FIX: FORCE REFRESH + CLEAR OLD DATA
@@ -92,15 +91,7 @@ console.log("Loaded code:", code);
     vehicleCode: code,
     stickerType: form.stickerType,
     whatsappUsername: form.whatsappUsername.trim().replace(/^@/, ""),
-    whatsappUsernameLink: form.whatsappUsernameLink.trim()
 };
-
-  // WhatsApp contact is optional, but username and sharing link must be paired.
-  if (Boolean(data.whatsappUsername) !== Boolean(data.whatsappUsernameLink)) {
-    setError("Enter both the WhatsApp username and official sharing link, or leave both blank.");
-    setTimeout(() => setError(""), 3000);
-    return;
-  }
 
   if (data.whatsappUsername && !/^[A-Za-z0-9._]{3,35}$/.test(data.whatsappUsername)) {
     setError("WhatsApp username must be 3-35 letters, numbers, dots or underscores.");
@@ -134,8 +125,7 @@ console.log("Loaded code:", code);
     address: "",
     vehicleNumber: "",
     stickerType: "",
-    whatsappUsername: "",
-    whatsappUsernameLink: ""
+    whatsappUsername: ""
   });
 
     setShowForm(false);
@@ -317,16 +307,8 @@ console.log("Loaded code:", code);
                 onChange={e => setForm({ ...form, whatsappUsername: e.target.value.replace(/^@/, "") })}
               />
 
-              <input
-                className="text-black"
-                type="url"
-                placeholder="Official WhatsApp username sharing link (optional)"
-                value={form.whatsappUsernameLink}
-                maxLength={500}
-                onChange={e => setForm({ ...form, whatsappUsernameLink: e.target.value.trimStart() })}
-              />
               <p style={{ color: "black", fontSize: "0.8rem" }}>
-                Copy the username sharing link from WhatsApp. Do not enter a phone-number link.
+                Enter the username exactly as it appears in WhatsApp. OwnTag creates the contact link automatically.
               </p>
 
               <textarea
