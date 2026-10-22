@@ -25,6 +25,7 @@ export default function LandingPage() {
   const [otpSentFor, setOtpSentFor] = useState("");
   const [verifiedEmail, setVerifiedEmail] = useState("");
   const [otpLoading, setOtpLoading] = useState(false);
+  const [otpMessage, setOtpMessage] = useState("");
 
   const [form, setForm] = useState({
   name: "",
@@ -49,7 +50,7 @@ export default function LandingPage() {
       setOtpSentFor(email);
       setVerifiedEmail("");
       setOtpCode("");
-      setError("OTP sent to your email. Check your inbox and spam folder.");
+      setOtpMessage("OTP sent to your email. Check your inbox and spam folder.");
     } catch (err) {
       setError(err.response?.data?.detail || err.response?.data?.message || "Could not send OTP. Check the email service configuration.");
     } finally {
@@ -60,6 +61,7 @@ export default function LandingPage() {
   const verifyEmailOtp = async () => {
     const email = form.email.trim().toLowerCase();
     setError("");
+    setOtpMessage("");
     if (otpSentFor !== email) {
       setError("Send an OTP to this email address first.");
       return;
@@ -72,7 +74,7 @@ export default function LandingPage() {
     try {
       await api.post("/email-otp/order/verify", { email, otp: otpCode });
       setVerifiedEmail(email);
-      setError("Email verified successfully.");
+      setOtpMessage("Email verified successfully.");
     } catch (err) {
       setError(err.response?.data?.detail || err.response?.data?.message || "OTP verification failed.");
     } finally {
@@ -166,6 +168,7 @@ if (!customerName) {
     setOtpCode("");
     setOtpSentFor("");
     setVerifiedEmail("");
+    setOtpMessage("");
 
     setTimeout(() => {
       setSuccess(false);
@@ -227,7 +230,7 @@ if (!customerName) {
 
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50">
 
-          <div className="bg-white text-black p-8 rounded-2xl w-[90%] max-w-md shadow-2xl relative">
+          <div className="bg-white text-black p-8 rounded-2xl w-[90%] max-w-md max-h-[90vh] overflow-y-auto shadow-2xl relative">
 
             <h2 className="text-2xl font-bold mb-6 text-center">
               🚗 Order Your QR Tag
@@ -287,9 +290,11 @@ if (!customerName) {
                 setOtpSentFor("");
                 setVerifiedEmail("");
                 setOtpCode("");
+                setOtpMessage("");
               }}
             />
             {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+            {otpMessage && <p role="status" className="text-green-700 text-sm font-semibold">{otpMessage}</p>}
 
             <button
               type="button"
