@@ -21,17 +21,64 @@ export default function LandingPage() {
   const [errors, setErrors] = useState({});
   const [error, setError] = useState("");
   const [showVideo, setShowVideo] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [otpSentFor, setOtpSentFor] = useState("");
+  const [verifiedEmail, setVerifiedEmail] = useState("");
+  const [otpLoading, setOtpLoading] = useState(false);
 
   const [form, setForm] = useState({
   name: "",
   phone: "",
-  emergencyName: "",
-  emergencyPhone: "",
+  email: "",
   vehicleNumber: "",
   address: "",
   stickerType: "",
   whatsappUsername: ""
 });
+
+  const sendEmailOtp = async () => {
+    const email = form.email.trim().toLowerCase();
+    setError("");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      setError("Enter a valid email address first.");
+      return;
+    }
+    setOtpLoading(true);
+    try {
+      await api.post("/email-otp/order/send", { email });
+      setOtpSentFor(email);
+      setVerifiedEmail("");
+      setOtpCode("");
+      setError("OTP sent to your email. Check your inbox and spam folder.");
+    } catch (err) {
+      setError(err.response?.data?.detail || err.response?.data?.message || "Could not send OTP. Check the email service configuration.");
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const verifyEmailOtp = async () => {
+    const email = form.email.trim().toLowerCase();
+    setError("");
+    if (otpSentFor !== email) {
+      setError("Send an OTP to this email address first.");
+      return;
+    }
+    if (!/^[0-9]{6}$/.test(otpCode)) {
+      setError("Enter the six-digit OTP.");
+      return;
+    }
+    setOtpLoading(true);
+    try {
+      await api.post("/email-otp/order/verify", { email, otp: otpCode });
+      setVerifiedEmail(email);
+      setError("Email verified successfully.");
+    } catch (err) {
+      setError(err.response?.data?.detail || err.response?.data?.message || "OTP verification failed.");
+    } finally {
+      setOtpLoading(false);
+    }
+  };
 
   const submit = async () => {
 
@@ -54,40 +101,15 @@ if (!customerName) {
     validationErrors.phone = "Phone number must contain exactly 10 digits.";
   }
 
-  // Emergency Name
-  // Emergency Contact Validation
-
-const emergencyName = form.emergencyName.trim();
-const emergencyPhone = form.emergencyPhone.trim();
-
-// If name is entered, phone is mandatory
-if (emergencyName && !emergencyPhone) {
-  validationErrors.emergencyPhone =
-    "Please enter the emergency contact number.";
-}
-
-// If phone is entered, name is mandatory
-if (emergencyPhone && !emergencyName) {
-  validationErrors.emergencyName =
-    "Please enter the emergency contact name.";
-}
-
-// Validate emergency name
-if (emergencyName) {
-  if (!/^[A-Za-z ]+$/.test(emergencyName)) {
-    validationErrors.emergencyName =
-      "Emergency contact name should contain only alphabets.";
-  } else if (emergencyName.replace(/\s/g, "").length < 4) {
-    validationErrors.emergencyName =
-      "Emergency contact name must contain at least 4 letters.";
+  // Email
+  const email = form.email.trim().toLowerCase();
+  if (!email) {
+    validationErrors.email = "Email address is required.";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+    validationErrors.email = "Enter a valid email address.";
+  } else if (verifiedEmail !== email) {
+    validationErrors.email = "Verify your email with the OTP before placing your order.";
   }
-}
-
-// Validate emergency phone
-if (emergencyPhone && !/^[0-9]{10}$/.test(emergencyPhone)) {
-  validationErrors.emergencyPhone =
-    "Emergency contact number must contain exactly 10 digits.";
-}
 
   // Sticker
   if (!form.stickerType) {
@@ -126,6 +148,7 @@ if (emergencyPhone && !/^[0-9]{10}$/.test(emergencyPhone)) {
 
     await api.post("/order", {
       ...form,
+      email: form.email.trim().toLowerCase(),
       whatsappUsername: whatsappUsername
     });
 
@@ -134,13 +157,15 @@ if (emergencyPhone && !/^[0-9]{10}$/.test(emergencyPhone)) {
     setForm({
       name: "",
       phone: "",
-      emergencyName: "",
-      emergencyPhone: "",
+      email: "",
       vehicleNumber: "",
       address: "",
       stickerType: "",
       whatsappUsername: ""
     });
+    setOtpCode("");
+    setOtpSentFor("");
+    setVerifiedEmail("");
 
     setTimeout(() => {
       setSuccess(false);
@@ -252,45 +277,52 @@ if (emergencyPhone && !/^[0-9]{10}$/.test(emergencyPhone)) {
 </div>
 
             <input
+              type="email"
               className="w-full p-3 border rounded-lg"
-              placeholder="👨 Emergency Contact Name (Optional)"
-              value={form.emergencyName}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  emergencyName:e.target.value.replace(/[^a-zA-Z ]/g,"")
-                })
-              }
+              placeholder="✉️ Email Address *"
+              autoComplete="email"
+              value={form.email}
+              onChange={(e) => {
+                setForm({ ...form, email: e.target.value });
+                setOtpSentFor("");
+                setVerifiedEmail("");
+                setOtpCode("");
+              }}
             />
-            {errors.emergencyName && (
-            <p className="text-red-500 text-sm">
-            {errors.emergencyName}
-            </p>
-            )}
+            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
 
-            <div className="flex items-center border rounded-lg overflow-hidden">
-            <span className="bg-gray-100 px-4 py-3 text-gray-700 font-semibold border-r">
-              +91
-            </span>
+            <button
+              type="button"
+              onClick={sendEmailOtp}
+              disabled={otpLoading}
+              className="w-full p-3 border border-indigo-500 rounded-lg font-semibold disabled:opacity-60"
+            >
+              {otpLoading ? "Please wait…" : "Send email OTP"}
+            </button>
 
-            <input
-              className="flex-1 p-3 outline-none"
-              placeholder="📞 Emergency Contact Number (Optional)"
-              value={form.emergencyPhone}
-              maxLength={10}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  emergencyPhone: e.target.value.replace(/\D/g,"").slice(0,10)
-                })
-              }
-            />
-            {errors.emergencyPhone && (
-            <p className="text-red-500 text-sm">
-            {errors.emergencyPhone}
-            </p>
+            {otpSentFor === form.email.trim().toLowerCase() && verifiedEmail !== form.email.trim().toLowerCase() && (
+              <div className="flex gap-2">
+                <input
+                  className="flex-1 min-w-0 p-3 border rounded-lg"
+                  placeholder="6-digit email OTP"
+                  value={otpCode}
+                  inputMode="numeric"
+                  maxLength={6}
+                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                />
+                <button
+                  type="button"
+                  onClick={verifyEmailOtp}
+                  disabled={otpLoading}
+                  className="px-4 rounded-lg bg-indigo-700 text-white font-semibold disabled:opacity-60"
+                >
+                  Verify
+                </button>
+              </div>
             )}
-          </div>
+            {verifiedEmail === form.email.trim().toLowerCase() && form.email && (
+              <p className="text-green-700 text-sm font-semibold">✓ Email verified</p>
+            )}
 
           <input
             className="w-full p-3 border rounded-lg"
