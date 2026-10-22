@@ -85,6 +85,20 @@ export default function Navbar({ onOrderClick,  showOrderButton = true, showTrac
               </button>
               )}
 
+                            <button
+                onClick={() => navigate("/customer-login")}
+                className="text-white hover:text-orange-400 transition font-medium"
+              >
+                Customer Login
+              </button>
+
+              <button
+                onClick={() => navigate("/customer-register")}
+                className="text-white hover:text-orange-400 transition font-medium"
+              >
+                Register
+              </button>
+
               {showOrderButton && (
               <button
                 onClick={onOrderClick}
@@ -139,6 +153,26 @@ export default function Navbar({ onOrderClick,  showOrderButton = true, showTrac
               className="text-white hover:text-orange-400"
             >
               Track Order
+            </button>
+
+            <button
+              onClick={() => {
+                navigate("/customer-login");
+                setOpen(false);
+              }}
+              className="text-white hover:text-orange-400"
+            >
+              Customer Login
+            </button>
+
+            <button
+              onClick={() => {
+                navigate("/customer-register");
+                setOpen(false);
+              }}
+              className="text-white hover:text-orange-400"
+            >
+              Register
             </button>
 
             <button
