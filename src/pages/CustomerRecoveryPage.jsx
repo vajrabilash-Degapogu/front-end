@@ -39,11 +39,14 @@ export default function CustomerRecoveryPage({ mode = "password" }) {
       if (isUsername) {
         const response = await api.post(base + "/verify-otp", { email: email.trim().toLowerCase(), otp });
         setMessage(response.data.message);
+        setOtpSent(false);
+        setOtp("");
       } else {
         const response = await api.post(base + "/reset", { email: email.trim().toLowerCase(), otp, newPassword });
         setMessage(response.data.message);
         setOtp("");
         setNewPassword("");
+        setOtpSent(false);
       }
     } catch (err) {
       setError(err.response?.data?.detail || err.response?.data?.message || (isUsername ? "OTP verification failed." : "Password reset failed."));
