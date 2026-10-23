@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/NavBar";
 import api from "../services/api";
@@ -23,7 +23,7 @@ export default function CustomerAccountPage() {
   const token = () => localStorage.getItem("customerToken");
   const authConfig = () => ({ headers: { Authorization: "Bearer " + token() } });
 
-  const loadTags = useCallback(async () => {
+  const loadTags = async () => {
     setTagsLoading(true);
     setTagsError("");
     try {
@@ -34,7 +34,7 @@ export default function CustomerAccountPage() {
     } finally {
       setTagsLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
     let active = true;
@@ -290,7 +290,7 @@ export default function CustomerAccountPage() {
                 <button onClick={verifyReorderOtp} disabled={reorderBusy} className="w-full rounded-lg bg-indigo-700 px-4 py-3 font-semibold text-white disabled:opacity-60">{reorderBusy ? "Please wait…" : "Verify OTP"}</button>
               </div>
             )}
-            {!otpSent && !verifiedEmail && (
+            {!otpSent && !verifiedEmail && !reorderMessage.startsWith("Your reorder request was submitted") && (
               <p className="mt-4 text-sm text-gray-600">{reorderBusy ? "Sending verification code…" : "Request an email OTP to continue."}</p>
             )}
             {verifiedEmail && (
