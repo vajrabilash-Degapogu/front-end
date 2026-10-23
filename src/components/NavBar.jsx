@@ -85,6 +85,20 @@ export default function Navbar({ onOrderClick,  showOrderButton = true, showTrac
               </button>
               )}
 
+                            <button
+                onClick={() => navigate("/customer-login")}
+                className="text-white hover:text-orange-400 transition font-medium"
+              >
+                Customer Login
+              </button>
+
+              <button
+                onClick={() => navigate("/customer-register")}
+                className="text-white hover:text-orange-400 transition font-medium"
+              >
+                Register
+              </button>
+
               {showOrderButton && (
               <button
                 onClick={onOrderClick}
@@ -131,25 +145,49 @@ export default function Navbar({ onOrderClick,  showOrderButton = true, showTrac
               Home
             </button>
 
+            {showTrackButton && (
+              <button
+                onClick={() => {
+                  navigate("/track");
+                  setOpen(false);
+                }}
+                className="text-white hover:text-orange-400"
+              >
+                Track Order
+              </button>
+            )}
+
             <button
               onClick={() => {
-                navigate("/track");
+                navigate("/customer-login");
                 setOpen(false);
               }}
               className="text-white hover:text-orange-400"
             >
-              Track Order
+              Customer Login
             </button>
 
             <button
               onClick={() => {
-                onOrderClick();
+                navigate("/customer-register");
                 setOpen(false);
               }}
-              className="bg-orange-500 px-8 py-3 rounded-xl font-semibold text-white shadow-lg"
+              className="text-white hover:text-orange-400"
             >
-              Get 2 Tags @ ₹339
+              Register
             </button>
+
+            {showOrderButton && (
+              <button
+                onClick={() => {
+                  onOrderClick?.();
+                  setOpen(false);
+                }}
+                className="bg-orange-500 px-8 py-3 rounded-xl font-semibold text-white shadow-lg"
+              >
+                Get 2 Tags @ ₹339
+              </button>
+            )}
 
             
 

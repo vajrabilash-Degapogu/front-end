@@ -192,11 +192,19 @@ const assignTag = async (tagId) => {
     ...editingOrder,
     name: editingOrder.name.trim(),
     phone: editingOrder.phone.trim(),
-    emergencyName: editingOrder.emergencyName.trim(),
-    emergencyPhone: editingOrder.emergencyPhone.trim(),
+    email: (editingOrder.email || "").trim().toLowerCase(),
+    emergencyName: (editingOrder.emergencyName || "").trim(),
+    emergencyPhone: (editingOrder.emergencyPhone || "").trim(),
     vehicleNumber: editingOrder.vehicleNumber.trim().toUpperCase(),
-    address: editingOrder.address.trim()
+    address: editingOrder.address.trim(),
+    whatsappUsername: (editingOrder.whatsappUsername || "").trim().replace(/^@/, "")
   };
+
+  if (data.whatsappUsername && !/^[A-Za-z0-9._]{3,35}$/.test(data.whatsappUsername)) {
+    setError("WhatsApp username must be 3-35 letters, numbers, dots or underscores.");
+    setTimeout(() => setError(""), 3000);
+    return;
+  }
 
   try {
 
@@ -247,6 +255,7 @@ const assignTag = async (tagId) => {
               <th>ID</th>
               <th>Name</th>
               <th>Phone</th>
+              <th>Email</th>
               <th>Vehicle</th>
               <th>Address</th>
               <th>Emergency Name</th> 
@@ -265,6 +274,7 @@ const assignTag = async (tagId) => {
                 <td>{o.id}</td>
                 <td>{o.name}</td>
                 <td>{o.phone}</td>
+                <td>{o.email}</td>
                 <td>{o.vehicleNumber}</td>
                 <td>{o.address}</td>
                 <td>{o.emergencyName}</td>
@@ -355,6 +365,13 @@ const assignTag = async (tagId) => {
               />
 
               <input
+                type="email"
+                value={editingOrder.email || ""}
+                placeholder="Customer email"
+                onChange={e => setEditingOrder({ ...editingOrder, email: e.target.value })}
+              />
+
+              <input
                 value={editingOrder.emergencyName || ""}
                 placeholder="Emergency Contact Name"
                 onChange={e =>
@@ -390,6 +407,20 @@ const assignTag = async (tagId) => {
                   setEditingOrder({ ...editingOrder, address: e.target.value })
                 }
               />
+
+              <input
+                value={editingOrder.whatsappUsername || ""}
+                placeholder="WhatsApp username (optional, without @)"
+                maxLength={35}
+                onChange={e => setEditingOrder({
+                  ...editingOrder,
+                  whatsappUsername: e.target.value.replace(/^@/, "")
+                })}
+              />
+
+              <p className="text-gray-600 text-sm">
+                OwnTag creates the WhatsApp username contact link automatically.
+              </p>
 
               <div className="modal-buttons">
                 <button onClick={updateOrder}>Save</button>

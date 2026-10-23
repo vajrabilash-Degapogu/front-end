@@ -14,7 +14,7 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
-  if (token) {
+  if (token && !config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
@@ -25,11 +25,20 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("username");
-      window.location.href = "/control-center";
-    }
+      const requestUrl = error.config?.url || "";
 
+      // Customer login failures should stay on the customer login form.
+      if (requestUrl.startsWith("/customer-auth/me")) {
+        localStorage.removeItem("customerToken");
+        localStorage.removeItem("customerUsername");
+        localStorage.removeItem("customerEmail");
+        window.location.href = "/customer-login";
+      } else if (!requestUrl.startsWith("/customer-auth/")) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+        window.location.href = "/control-center";
+      }
+    }
     return Promise.reject(error);
   }
 );

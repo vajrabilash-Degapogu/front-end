@@ -150,11 +150,19 @@ const downloadPdf = async (sheetCode) => {
     ...editingCustomer,
     ownerName: editingCustomer.ownerName.trim(),
     phoneNumber: editingCustomer.phoneNumber.trim(),
-    emergencyName: editingCustomer.emergencyName.trim(),
-    emergencyPhone: editingCustomer.emergencyPhone.trim(),
+    email: (editingCustomer.email || "").trim().toLowerCase(),
+    emergencyName: (editingCustomer.emergencyName || "").trim(),
+    emergencyPhone: (editingCustomer.emergencyPhone || "").trim(),
     vehicleNumber: editingCustomer.vehicleNumber.trim().toUpperCase(),
-    address: editingCustomer.address.trim()
+    address: editingCustomer.address.trim(),
+    whatsappUsername: (editingCustomer.whatsappUsername || "").trim().replace(/^@/, "")
   };
+
+  if (data.whatsappUsername && !/^[A-Za-z0-9._]{3,35}$/.test(data.whatsappUsername)) {
+    setError("WhatsApp username must be 3-35 letters, numbers, dots or underscores.");
+    setTimeout(() => setError(""), 3000);
+    return;
+  }
 
   try {
 
@@ -205,6 +213,7 @@ const downloadPdf = async (sheetCode) => {
               <th>ID</th>
               <th>Name</th>
               <th>Phone</th>
+              <th>Email</th>
               <th>Vehicle</th>
               <th>Tag ID</th>
               <th>Sheet</th>
@@ -222,6 +231,7 @@ const downloadPdf = async (sheetCode) => {
                 <td>{c.id}</td>
                 <td>{c.ownerName}</td>
                 <td>{c.phoneNumber}</td>
+                <td>{c.email || "—"}</td>
                 <td>{c.vehicleNumber}</td>
                 <td>{c.tagId}</td>
                 <td>{c.sheetCode}</td>
@@ -283,6 +293,13 @@ const downloadPdf = async (sheetCode) => {
               />
 
               <input
+                type="email"
+                value={editingCustomer.email || ""}
+                placeholder="Customer email"
+                onChange={e => setEditingCustomer({ ...editingCustomer, email: e.target.value })}
+              />
+
+              <input
                 value={editingCustomer.emergencyName || ""}
                 placeholder="Emergency Contact Name"
                 onChange={e =>
@@ -318,6 +335,20 @@ const downloadPdf = async (sheetCode) => {
                   setEditingCustomer({ ...editingCustomer, address: e.target.value })
                 }
               />
+
+              <input
+                value={editingCustomer.whatsappUsername || ""}
+                placeholder="WhatsApp username (optional, without @)"
+                maxLength={35}
+                onChange={e => setEditingCustomer({
+                  ...editingCustomer,
+                  whatsappUsername: e.target.value.replace(/^@/, "")
+                })}
+              />
+
+              <p className="text-gray-600 text-sm">
+                OwnTag creates the WhatsApp username contact link automatically.
+              </p>
 
               <div className="modal-buttons">
                 <button onClick={updateCustomer}>Save</button>

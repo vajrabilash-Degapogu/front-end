@@ -11,15 +11,19 @@ function VehiclePage() {
   const [showForm, setShowForm] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [otpCode, setOtpCode] = useState("");
+  const [otpSentFor, setOtpSentFor] = useState("");
+  const [verifiedEmail, setVerifiedEmail] = useState("");
+  const [otpLoading, setOtpLoading] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
     phone: "",
-    emergencyName: "",
-    emergencyPhone: "",
+    email: "",
     address: "",
     vehicleNumber: "",
-    stickerType: ""
+    stickerType: "",
+    whatsappUsername: ""
   });
 
   // ✅ FIX: FORCE REFRESH + CLEAR OLD DATA
@@ -59,13 +63,6 @@ setError(message);
 }, [code]);
 console.log("Loaded code:", code);
 
-  const callNow = () => {
-    setMessage("📞 Connecting call...");
-    setTimeout(() => {
-      window.location.href = `${api.defaults.baseURL}/call/${code}`;
-    }, 800);
-  };
-
   const callEmergency = () => {
   setMessage("📞 Calling Emergency Contact...");
 
@@ -75,10 +72,58 @@ console.log("Loaded code:", code);
 };
 
   const whatsapp = () => {
+    if (!vehicle?.whatsappAvailable) {
+      setError("WhatsApp username contact is not configured for this vehicle yet.");
+      setTimeout(() => setError(""), 3000);
+      return;
+    }
+
     setMessage("Opening WhatsApp...");
-    setTimeout(() => {
-      window.location.href = `${api.defaults.baseURL}/whatsapp/${code}`;
-    }, 800);
+    window.location.href = `${api.defaults.baseURL}/whatsapp/${code}`;
+  };
+
+  const sendEmailOtp = async () => {
+    const email = form.email.trim().toLowerCase();
+    setError("");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      setError("Enter a valid email address first.");
+      return;
+    }
+    setOtpLoading(true);
+    try {
+      await api.post("/email-otp/order/send", { email });
+      setOtpSentFor(email);
+      setVerifiedEmail("");
+      setOtpCode("");
+      setMessage("Email OTP sent. Check your inbox and spam folder.");
+    } catch (err) {
+      setError(err.response?.data?.detail || err.response?.data?.message || "Could not send OTP. Check email service configuration.");
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+  const verifyEmailOtp = async () => {
+    const email = form.email.trim().toLowerCase();
+    setError("");
+    if (otpSentFor !== email) {
+      setError("Send an OTP to this email address first.");
+      return;
+    }
+    if (!/^[0-9]{6}$/.test(otpCode)) {
+      setError("Enter the six-digit OTP.");
+      return;
+    }
+    setOtpLoading(true);
+    try {
+      await api.post("/email-otp/order/verify", { email, otp: otpCode });
+      setVerifiedEmail(email);
+      setMessage("Email verified successfully.");
+    } catch (err) {
+      setError(err.response?.data?.detail || err.response?.data?.message || "OTP verification failed.");
+    } finally {
+      setOtpLoading(false);
+    }
   };
 
   const submitOrder = async () => {
@@ -86,25 +131,44 @@ console.log("Loaded code:", code);
   const data = {
     name: form.name.trim(),
     phone: form.phone.trim(),
-    emergencyName: form.emergencyName.trim(),
-    emergencyPhone: form.emergencyPhone.trim(),
+    email: form.email.trim().toLowerCase(),
     address: form.address.trim(),
     vehicleNumber: form.vehicleNumber.trim().toUpperCase(),
     vehicleCode: code,
-    stickerType: form.stickerType
+    stickerType: form.stickerType,
+    whatsappUsername: form.whatsappUsername.trim().replace(/^@/, ""),
 };
+
+  if (data.whatsappUsername && !/^[A-Za-z0-9._]{3,35}$/.test(data.whatsappUsername)) {
+    setError("WhatsApp username must be 3-35 letters, numbers, dots or underscores.");
+    setTimeout(() => setError(""), 3000);
+    return;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(data.email)) {
+    setError("Enter a valid email address.");
+    setTimeout(() => setError(""), 3000);
+    return;
+  }
+
+  if (verifiedEmail !== data.email) {
+    setError("Verify your email with the OTP before placing your order.");
+    setTimeout(() => setError(""), 3000);
+    return;
+  }
 
   if (
     !data.name ||
     !data.phone ||
+    !data.email ||
     !data.address ||
     !data.vehicleNumber ||
     !form.stickerType
-) {
-    setError("Please select sticker type.");
+  ) {
+    setError("Please complete all required fields and select sticker type.");
     setTimeout(() => setError(""), 2500);
     return;
-}
+  }
 
   try {
 
@@ -115,11 +179,15 @@ console.log("Loaded code:", code);
     setForm({
     name: "",
     phone: "",
-    emergencyName: "",
-    emergencyPhone: "",
+    email: "",
     address: "",
-    vehicleNumber: ""
+    vehicleNumber: "",
+    stickerType: "",
+    whatsappUsername: ""
   });
+    setOtpCode("");
+    setOtpSentFor("");
+    setVerifiedEmail("");
 
     setShowForm(false);
 
@@ -199,14 +267,7 @@ console.log("Loaded code:", code);
 
             <div className="buttons">
 
-            <button
-                style={{ backgroundColor: "white", color: "blue" }}
-                onClick={callNow}
-              >
-                📞 Call Owner
-              </button>
-
-              {vehicle.emergencyPhone && vehicle.emergencyPhone.trim() !== "" && (
+              {vehicle.emergencyContactAvailable && (
                 <button
                   style={{ backgroundColor: "#ff9800", color: "white" }}
                   onClick={callEmergency}
@@ -216,13 +277,31 @@ console.log("Loaded code:", code);
               )}
 
               <button
-                style={{ backgroundColor: "green" }}
+                style={{ backgroundColor: "green", opacity: vehicle.whatsappAvailable ? 1 : 0.55 }}
                 onClick={whatsapp}
+                disabled={!vehicle.whatsappAvailable}
+                title={!vehicle.whatsappAvailable ? "Owner has not configured WhatsApp username contact yet" : "Open WhatsApp"}
               >
-                💬 WhatsApp
+                💬 Chat & Call on WhatsApp
               </button>
 
           </div>
+
+            {vehicle.whatsappAvailable && (
+              <>
+                <p style={{ color: "black", marginTop: "8px" }}>
+                  WhatsApp username: @{vehicle.whatsappUsername}
+                </p>
+                <p style={{ color: "black", fontSize: "0.9rem" }}>
+                  Start the chat in WhatsApp, then tap its voice-call icon to speak with the owner.
+                </p>
+              </>
+            )}
+            {!vehicle.whatsappAvailable && (
+              <p style={{ color: "black", marginTop: "8px", fontSize: "0.9rem" }}>
+                WhatsApp username contact is not configured for this vehicle yet.
+              </p>
+            )}
 
             <hr />
 
@@ -257,29 +336,30 @@ console.log("Loaded code:", code);
               />
 
               <input
+                type="email"
                 className="text-black"
-                placeholder="👨 Emergency Contact Name (Optional)"
-                value={form.emergencyName}
-                onChange={e =>
-                  setForm({
-                    ...form,
-                    emergencyName: e.target.value
-                  })
-                }
+                placeholder="✉️ Email Address *"
+                autoComplete="email"
+                value={form.email}
+                onChange={e => {
+                  setForm({ ...form, email: e.target.value });
+                  setOtpSentFor("");
+                  setVerifiedEmail("");
+                  setOtpCode("");
+                }}
               />
 
               <input
                 className="text-black"
-                placeholder="📞 Emergency Contact Number (Optional)"
-                value={form.emergencyPhone}
-                maxLength={10}
-                onChange={e =>
-                  setForm({
-                    ...form,
-                    emergencyPhone: e.target.value.replace(/\D/g, "")
-                  })
-                }
+                placeholder="WhatsApp username (optional, without @)"
+                value={form.whatsappUsername}
+                maxLength={35}
+                onChange={e => setForm({ ...form, whatsappUsername: e.target.value.replace(/^@/, "") })}
               />
+
+              <p style={{ color: "black", fontSize: "0.8rem" }}>
+                Enter the username exactly as it appears in WhatsApp. OwnTag creates the contact link automatically.
+              </p>
 
               <textarea
                 className="text-black"
@@ -329,6 +409,39 @@ console.log("Loaded code:", code);
                   })
                 }
               />
+
+              <button
+                type="button"
+                onClick={sendEmailOtp}
+                disabled={otpLoading}
+                className="rounded-lg border border-indigo-600 p-3 font-semibold disabled:opacity-60"
+              >
+                {otpLoading ? "Please wait…" : "Send email OTP"}
+              </button>
+
+              {otpSentFor === form.email.trim().toLowerCase() && verifiedEmail !== form.email.trim().toLowerCase() && (
+                <div className="flex gap-2">
+                  <input
+                    className="text-black min-w-0 flex-1"
+                    placeholder="6-digit email OTP"
+                    value={otpCode}
+                    inputMode="numeric"
+                    maxLength={6}
+                    onChange={e => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  />
+                  <button
+                    type="button"
+                    onClick={verifyEmailOtp}
+                    disabled={otpLoading}
+                    className="rounded-lg bg-indigo-700 px-4 text-white font-semibold disabled:opacity-60"
+                  >
+                    Verify
+                  </button>
+                </div>
+              )}
+              {verifiedEmail === form.email.trim().toLowerCase() && form.email && (
+                <p className="text-green-700 text-sm font-semibold">✓ Email verified</p>
+              )}
 
                 <button style={{ color: "black" }} onClick={submitOrder}>
                   Submit Order
