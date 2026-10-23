@@ -16,6 +16,8 @@ export default function CustomerRegisterPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const normalizedEmail = email.trim().toLowerCase();
+  const emailVerified = validEmail(email) && verifiedEmail === normalizedEmail;
 
   const sendOtp = async () => {
     setError(""); setMessage("");
@@ -78,15 +80,15 @@ export default function CustomerRegisterPage() {
             <input type="email" autoComplete="email" value={email} onChange={e => { setEmail(e.target.value); setVerifiedEmail(""); setOtpSent(false); setOtp(""); }} className="mt-1 w-full rounded-lg border p-3 font-normal" required />
           </label>
           <button type="button" onClick={sendOtp} disabled={loading} className="w-full rounded-lg border border-indigo-600 text-indigo-700 font-semibold p-3 disabled:opacity-60">{loading ? "Please wait…" : "Send email OTP"}</button>
-          {otpSent && verifiedEmail !== email.trim().toLowerCase() && <div className="flex gap-2">
+          {otpSent && validEmail(email) && !emailVerified && <div className="flex gap-2">
             <input aria-label="Email OTP" value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))} className="min-w-0 flex-1 rounded-lg border p-3" placeholder="6-digit OTP" inputMode="numeric" maxLength={6} />
             <button type="button" onClick={verifyOtp} disabled={loading} className="rounded-lg bg-indigo-700 px-4 text-white font-semibold disabled:opacity-60">Verify</button>
           </div>}
-          {verifiedEmail === email.trim().toLowerCase() && <p className="text-green-700 font-semibold text-sm">✓ Email verified</p>}
+          {emailVerified && <p role="status" className="text-green-700 font-semibold text-sm">✓ Email verified</p>}
           <label className="block text-sm font-semibold">Password
             <input type="password" autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} className="mt-1 w-full rounded-lg border p-3 font-normal" minLength={8} maxLength={72} required />
           </label>
-          <button disabled={loading || verifiedEmail !== email.trim().toLowerCase()} className="w-full rounded-lg bg-orange-600 text-white font-semibold p-3 disabled:opacity-50">{loading ? "Please wait…" : "Register"}</button>
+          <button disabled={loading || !emailVerified} className="w-full rounded-lg bg-orange-600 text-white font-semibold p-3 disabled:opacity-50">{loading ? "Please wait…" : "Register"}</button>
           <p className="text-center text-sm">Already registered? <Link className="text-indigo-700 font-semibold hover:underline" to="/customer-login">Login</Link></p>
         </form>
       </div>
